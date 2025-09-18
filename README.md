@@ -20,4 +20,7 @@ python llh2.py
 ```
 A New version of llh2.c and llh2.h should appear in the build directory if all was done correctly.
 
-CMakeLists.txt file coming soon.
+## TODOS
+- CMakeLists.txt file coming soon.
+- Tests for C
+- A workflow simillar to llhttp for releases.
