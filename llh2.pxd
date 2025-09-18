@@ -1,6 +1,5 @@
 # cython: language_level = 3
 # if you plan to use in cython simply copying this code or file should do the job
-
 from libc.stdint cimport int32_t as int32_t
 from libc.stdint cimport uint32_t as uint32_t 
 from libc.stdint cimport uint8_t as uint8_t   
@@ -11,22 +10,22 @@ cdef extern from "build/llh2.h" nogil:
         H2RF_PAUSE = 0
         H2RF_EXIT = 1
     ctypedef llh2_reset_flag llh2_reset_flag_t
+    
     enum llh2_errno:
         H2PE_OK = 0
         H2PE_PAUSED = 1
-        H2PE_LENGTH_OVERFLOW = 2
-        H2PE_STREAM_ID_OVERFLOW = 3
-        H2PE_CB_ON_FRAME_START = 4
-        H2PE_CB_ON_FRAME_END = 5
-        H2PE_CB_ON_LENGTH = 6
-        H2PE_CB_ON_STREAM_ID = 7
-        H2PE_CB_ON_TYPE = 8
-        H2PE_CB_ON_FLAG = 9
-        H2PE_CB_ON_BODY_START = 10
-        H2PE_CB_ON_BODY_END = 11
-        H2PE_CB_ON_RESET = 12
-        H2PE_EXIT = 13
-        H2PE_USER = 14
+        H2PE_CB_ON_FRAME_START = 2
+        H2PE_CB_ON_FRAME_END = 3
+        H2PE_CB_ON_LENGTH = 4
+        H2PE_CB_ON_STREAM_ID = 5
+        H2PE_CB_ON_TYPE = 6
+        H2PE_CB_ON_FLAG = 7
+        H2PE_CB_ON_BODY_START = 8
+        H2PE_CB_ON_BODY_END = 9
+        H2PE_CB_ON_RESET = 10
+        H2PE_EXIT = 11
+        H2PE_USER = 12
+    
     ctypedef llh2_errno llh2_errno_t
 
     ctypedef struct llh2__internal_s:
