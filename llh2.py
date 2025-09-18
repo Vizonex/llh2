@@ -47,9 +47,6 @@ class UnpackCB(TypedDict):
 class Error(IntEnum):
     OK = 0
     PAUSED = 1
-    # The only 2 that have a chance to overflow
-    LENGTH_OVERFLOW = auto()
-    STREAM_ID_OVERFLOW = auto()
 
     # CALLBACKS
     CB_ON_FRAME_START = auto()
@@ -211,3 +208,4 @@ if __name__ == "__main__":
     build_folder = Path("build")
     (build_folder / "llh2.c").write_text(src.c)
     (build_folder / "llh2.h").write_text(buildCHeaders() + src.header)
+
