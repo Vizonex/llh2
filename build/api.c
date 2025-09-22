@@ -112,7 +112,7 @@ int llh2__internal__on_body (
     llh2_t *s, const unsigned char *p,
     const unsigned char *endp){
     int err;
-    H2_SPAN_CALLBACK_MAYBE(s, on_body, endp - p);
+    H2_SPAN_CALLBACK_MAYBE(s, on_body, p, endp - p);
     return err;
 };
 
@@ -221,7 +221,7 @@ int llh2__internal__altsvc_origin_value (
     llh2_t *s, const unsigned char *p,
     const unsigned char *endp){
     int err;
-    H2_SPAN_CALLBACK_MAYBE(s, altsvc_origin_value, endp - p);
+    H2_SPAN_CALLBACK_MAYBE(s, altsvc_origin_value, p, endp - p);
     return err;
 };
 
@@ -240,7 +240,7 @@ int llh2__internal__altsvc_field_value (
     llh2_t *s, const unsigned char *p,
     const unsigned char *endp){
     int err;
-    H2_SPAN_CALLBACK_MAYBE(s, altsvc_field_value, endp - p);
+    H2_SPAN_CALLBACK_MAYBE(s, altsvc_field_value, p, endp - p);
     return err;
 };
 
@@ -320,14 +320,12 @@ void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
 {
     if (p == endp)
     {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s
-", s, s->type,
+        fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", s, s->type,
                 s->flags, msg);
     }
     else
     {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s
-", s,
+        fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n", s,
                 s->type, s->flags, *p, msg);
     }
 }
