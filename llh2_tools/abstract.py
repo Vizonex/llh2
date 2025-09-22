@@ -155,7 +155,7 @@ class SpanWrap(LLExt):
         code += "    llh2_t *s, const unsigned char *p,\n"
         code += "    const unsigned char *endp){\n"
         code += "    int err;\n"
-        code += f"    H2_SPAN_CALLBACK_MAYBE(s, {self.name}, endp - p);\n"
+        code += f"    H2_SPAN_CALLBACK_MAYBE(s, {self.name}, p, endp - p);\n"
         code += "    return err;\n};"
         return code
 

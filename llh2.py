@@ -304,12 +304,12 @@ void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
 {
     if (p == endp)
     {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\n", s, s->type,
+        fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\\n", s, s->type,
                 s->flags, msg);
     }
     else
     {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\n", s,
+        fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\\n", s,
                 s->type, s->flags, *p, msg);
     }
 }
