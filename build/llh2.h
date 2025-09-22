@@ -115,6 +115,7 @@ struct llh2__internal_s {
   uint32_t  stream_id;
   uint8_t  type;
   uint8_t  flags;
+  uint8_t  is_exclusive;
   uint32_t  _sub_length;
   uint8_t  pad_length;
   uint8_t  stream_weight;

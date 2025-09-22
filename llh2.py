@@ -787,7 +787,6 @@ class H2Parser(AbstractParser):
     def build(self):
         p = self.llparse
         p.property("ptr", "settings")
-
         # sperate node to safely hook stream_id later, Peephole should clear it beforehand
         pre_stream_id = p.node('pre_stream_id')
         
@@ -795,6 +794,7 @@ class H2Parser(AbstractParser):
         stream_id = self.int("stream_id", 'i32', Error.CB_ON_STREAM_ID, 4)
         ty = self.uint('type', 'i8', Error.CB_ON_TYPE)
         flags = self.uint('flags', "i8", Error.CB_ON_FLAG)
+        p.property('i8', 'is_exclusive')
 
 
         # _sub_length used for subtraction (internal) 
