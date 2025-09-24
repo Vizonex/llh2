@@ -183,6 +183,8 @@ llh2_errno_t llh2_execute(llh2_t* parser, const char* data, size_t len);
 LLH2_EXPORT
 const char* llh2_get_type_name(llh2_t* parser);
 
+LLH2_EXPORT
+void llh2_settings_init(llh2_settings_t* settings);
 
 #ifdef __cplusplus
 }
@@ -297,25 +299,9 @@ const char* llh2_get_type_name(llh2_t* parser){
     }
 }
 
-/* Private */
-
-void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
-                 const char *msg)
-{
-    if (p == endp)
-    {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=null debug=%s\\n", s, s->type,
-                s->flags, msg);
-    }
-    else
-    {
-        fprintf(stderr, "p=%p type=%d flags=%02x next=%02x   debug=%s\\n", s,
-                s->type, s->flags, *p, msg);
-    }
-}
-
-
-
+void llh2_settings_init(llh2_settings_t* settings){
+    memset(settings, 0, sizeof(*settings));
+};
 
 """
 
@@ -680,7 +666,7 @@ class WindowUpdateFrame(AbstractParser):
     # 0x08
     def __init__(self, llparse, callbacks = {}, fields = {}):
         super().__init__(llparse, callbacks, fields)
-        self.on_window_increment = self.int(
+        self.on_window_increment = self.uint(
             "window_increment", "i32", Error.CB_ON_WINDOW_INCREMENT
         )
 
@@ -853,15 +839,24 @@ class H2Parser(AbstractParser):
     def build_api(self):
         """Build all callbacks that can at least be safely automated
         rest are left to http2.c to handle"""
-        code = CAPI_PROLOUGE
-        code += "/* AUTO GENERATED CALLBACKS PLEASE DO NOT EDIT!!! */\n\n"
+        code = CAPI_PROLOUGE + "\n"
+
+        code += "/* AUTO GENERATED PLEASE DO NOT EDIT!!! */\n\n"
         
         for cbs in self.callbacks.values():
             code += cbs.do_build() + '\n\n'
-        
-        code += CAPI_EPILOUGE
-        return code
+        return code + CAPI_EPILOUGE
 
+    def build_test(self):
+        """Build all callbacks that can at least be safely automated
+        rest are left to http2.c to handle"""
+        code = ""
+        # code += "/* AUTO GENERATED CALLBACKS PLEASE DO NOT EDIT!!! */\n\n"
+        
+        for cbs in self.callbacks.values():
+            code += cbs.do_cython_setter()
+  
+        return code
 
 
 
@@ -870,13 +865,15 @@ if __name__ == "__main__":
     p = H2Parser(llh2)
     root = p.build()
     src = llh2.build(
-        root, header_name="llh2", headerGuard="INCLUDE_LLH2_ITSELF_H_"
+        root, header_name="llh2", headerGuard="INCLUDE_LLH2_ITSELF_H_",
+        # debug='llh2__internal_debug'
     )
-    build_folder = Path("build")
+    build_folder = Path("src")
+    include = Path("include")
+
 
     (build_folder / "llh2.c").write_text(src.c)
-    (build_folder / "llh2.h").write_text(buildCHeaders() + src.header + '\n' + p.do_build())
+    (include / "llh2.h").write_text(buildCHeaders() + src.header + '\n' + p.do_build())
     (build_folder / "api.c").write_text(p.build_api())
-
 
 

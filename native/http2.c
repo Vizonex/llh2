@@ -1,4 +1,5 @@
 #include "llh2.h"
+#include "stdio.h"
 
 int llh2__settings_subtract (
     llh2__internal_t* s, const unsigned char* p,
@@ -56,6 +57,7 @@ int llh2__before_pad_length (
     if (s->_sub_length){
         s->_sub_length -= (uint32_t)(*p);
     }
+    return 0;
 }
 
 int llh2__post_dependency_id(
@@ -65,4 +67,37 @@ int llh2__post_dependency_id(
     s->is_exclusive = (s->dependency_id >> 31) ? 1: 0;
     s->dependency_id &= 0x7FFFFFFF;
     return 0;
+}
+
+int llh2__before_data_frame_body_start(
+    llh2_t* s, const unsigned char *p,
+    const unsigned char *endp){
+    s->_sub_length = s->length - s->pad_length;
+    return 0;
+}
+
+int llh2__before_priority(
+    llh2_t* s, const unsigned char *p,
+    const unsigned char *endp){
+    if (s->length >= 5){
+        s->_sub_length = s->length - 5;
+        return 0;
+    }
+    /* FAIL */
+    return 1;
+}
+
+void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
+                 const char *msg)
+{
+    if (p == endp)
+    {
+        fprintf(stderr, "p=%p type=%d flags=%02x stream_id=%d next=null debug=%s\n", s, s->type,
+                s->flags, s->stream_id, msg);
+    }
+    else
+    {
+        fprintf(stderr, "p=%p type=%d flags=%02x stream_id=%d next=%02x   debug=%s\n", s,
+                s->type, s->flags, s->stream_id, *p, msg);
+    }
 }

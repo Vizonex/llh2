@@ -125,6 +125,28 @@ class MatchWrap(CodeWrap):
         code += "    return err;\n};\n"
         return code
 
+    def do_test(self) -> str:
+        code = f"    cdef int _{self.name}(self):\n"
+        code += '        cdef object i\n'
+        code += '        try:\n'
+        code += f'           if i := self.{self.name}():\n'
+        code += f'               return <int>i\n'
+        code += '            return 0\n'
+        code += '       except Execption:\n           return -1'
+        return code
+
+    def do_cython(self) -> str:
+        code = f"cdef int cb_{self.name}(llh2_t *s):\n"
+        code += "    cdef Parser p = <Parser>s.data\n"
+        code += f"    return p._{self.name}()\n"
+        return code
+
+    def do_cython_setter(self) -> str:
+        code = f'        if hasattr(self, {self.name}):\n'
+        code += f'            self._csettings.{self.name} = cb_{self.name}\n\n'
+        return code
+
+
     @property
     def cb_property(self) -> str:
         """Writes callback property"""
@@ -164,6 +186,26 @@ class SpanWrap(LLExt):
         """Writes callback property"""
         return f"  llh2_data_cb {self.name};"
 
+    def do_test(self) -> str:
+        code = f"    cdef int _{self.name}(self, bytes ob):\n"
+        code += '       cdef object i\n'
+        code += '       try:\n'
+        code += f'          if i := self.{self.name}(ob):\n'
+        code += f'              return <int>i\n'
+        code += '           return 0\n\n'
+        code += '       except Execption:\n         return -1'
+        return code
+    
+    def do_cython(self) -> str:
+        code = f"cdef int cb_{self.name}(llh2_t *s, const char* p, size_t len):\n"
+        code += "    cdef Parser p = <Parser>s.data\n"
+        code += f"    return p._{self.name}(PyBytes_FromStringAndSize(p, <Py_ssize_t>len))\n"
+        return code
+
+    def do_cython_setter(self) -> str:
+        code = f'        if hasattr(self, {self.name}):\n'
+        code += f'            self._csettings.{self.name} = cb_{self.name}\n\n'
+        return code
 
 BITDICT = {"i8": 1, "i16": 2, "i32": 4}
 
@@ -174,7 +216,7 @@ class IntField(LLExt):
     can be possibly carrying"""
 
     def __factory__(self, field:str, ty: Literal['i8', 'i16', 'i32'], bits:int | None):
-        return self.llparse.intLE(field, bits or BITDICT[ty])
+        return self.llparse.intBE(field, bits or BITDICT[ty])
 
     def __init__(
         self,
@@ -212,7 +254,7 @@ class IntField(LLExt):
 
 class UIntField(IntField):
     def __factory__(self, field:str, ty: Literal['i8', 'i16', 'i32'], bits:int | None):
-        return self.llparse.uintLE(field, bits or BITDICT[ty])
+        return self.llparse.uintBE(field, bits or BITDICT[ty])
 
 UNSIGNED_TYPES: dict[str, str] = {
     "i8": "uint8_t",

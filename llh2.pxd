@@ -96,8 +96,8 @@ cdef extern from "build/llh2.h":
     int llh2__internal_execute(llh2__internal_t*, const char*, const char*)
     ctypedef llh2__internal_t llh2_t
     
-    ctypedef int (*llh2_data_cb)(llh2_t*, const char*, size_t)
-    ctypedef int (*llh2_cb)(llh2_t*)
+    ctypedef int (*llh2_data_cb)(llh2_t*, const char*, size_t) noexcept
+    ctypedef int (*llh2_cb)(llh2_t*) noexcept
     struct llh2_settings_s:
         llh2_data_cb on_body
         llh2_data_cb altsvc_origin_value
@@ -134,3 +134,6 @@ cdef extern from "build/llh2.h":
     void llh2_resume(llh2_t*)
     llh2_errno_t llh2_execute(llh2_t*, const char*, size_t)
     const char* llh2_get_type_name(llh2_t*)
+
+    void llh2_settings_init(llh2_settings_t* settings)
+    
