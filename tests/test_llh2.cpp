@@ -2,7 +2,7 @@
 #include "ctest.h"
 #include "llh2.h"
 
-/* Will use C++ for buffers since this spans can get a bit annoying... */
+/* Will use C++ for buffers since these spans can get a bit annoying... */
 #include <string>
 #include <stdint.h>
 
