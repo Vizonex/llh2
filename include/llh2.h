@@ -177,8 +177,8 @@ struct llh2_settings_s {
   llh2_cb on_stream_id_complete;
   llh2_cb on_type_complete;
   llh2_cb on_flags_complete;
-  llh2_cb on_body_complete;
   llh2_cb on_pad_length_complete;
+  llh2_cb on_body_complete;
   llh2_cb on_stream_weight_complete;
   llh2_cb on_dependency_id_complete;
   llh2_cb on_error_code_complete;

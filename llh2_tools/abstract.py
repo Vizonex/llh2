@@ -240,9 +240,12 @@ class IntField(LLExt):
     def consume(self, next: Node):
         return self.node.skipTo(self.on_complete.invoke_pausable(self.err, next))
 
-    def consume_and_complete_after(self, send: Node, next:Node):
+    def consume_and_complete_after(self, send: Node, next:Node, advance:bool = True):
         """Handle something before sending through to be invoked"""
-        self.node.skipTo(send)
+        if advance:
+            self.node.skipTo(send)
+        else:
+            self.node.otherwise(send)
         return send.otherwise(self.on_complete.invoke_pausable(self.err, next))
 
     @property

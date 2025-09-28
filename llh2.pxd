@@ -3,7 +3,7 @@ from libc.stdint cimport uint16_t as uint16_t
 from libc.stdint cimport uint32_t as uint32_t
 from libc.stdint cimport uint8_t as uint8_t
 
-cdef extern from "build/llh2.h":
+cdef extern from "include/llh2.h":
     enum llh2_reset_flag:
         H2RF_ERROR = -1
         H2RF_PAUSE = 0
@@ -79,6 +79,7 @@ cdef extern from "build/llh2.h":
         uint32_t stream_id
         uint8_t type
         uint8_t flags
+        uint8_t is_exclusive
         uint32_t _sub_length
         uint8_t pad_length
         uint8_t stream_weight

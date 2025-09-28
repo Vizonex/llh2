@@ -8,6 +8,7 @@ import struct
 from abc import abstractmethod, ABC
 from llh2_tools.error import Error
 from llh2_tools.abstract import LLExt, SpanWrap, IntField, MatchWrap, UIntField
+import sys
 
 
 class Encoding(IntEnum):
@@ -55,7 +56,6 @@ class FrameType(IntEnum):
     WINDOW_UPDATE = 0x08
     CONTINUATION = 0x09
     ALTSVC = 0x0A
-
 
 
 class AckFlags(IntFlag):
@@ -305,6 +305,7 @@ void llh2_settings_init(llh2_settings_t* settings){
 
 """
 
+
 def buildCHeaders():
     res = ""
     res += "#ifndef LLH2_C_HEADERS__H__\n"
@@ -361,9 +362,9 @@ class AbstractParser(LLExt):
         if field in self.fields:
             return self.fields[field]  # should be truthy
         f = UIntField(self.llparse, field, ty, err, bits)
-        # just need to holding onto this for writing 
+        # just need to holding onto this for writing
         # the settings structure
-        if f'{field}_complete' not in self.callbacks:
+        if f"{field}_complete" not in self.callbacks:
             self.callbacks[f"{field}_complete"] = f.on_complete
         return f
 
@@ -378,8 +379,8 @@ class AbstractParser(LLExt):
             return self.fields[field]  # value should be truthy
 
         f = IntField(self.llparse, field, ty, err, bits)
-        
-        if f'{field}_complete' not in self.callbacks:
+
+        if f"{field}_complete" not in self.callbacks:
             self.callbacks[f"{field}_complete"] = f.on_complete
 
         return f
@@ -425,10 +426,17 @@ class AbstractParser(LLExt):
 
 
 class Padding(AbstractParser):
-    def build(self, end: Node) -> Node:
-        p = self.llparse
+    def __init__(self, llparse, callbacks = {}, fields = {}):
+        super().__init__(llparse, callbacks, fields)
+        self.pad_length = self.uint("pad_length", "i8", Error.CB_ON_PAD_LENGTH, 1)
 
-        pad_length = self.uint("pad_length", "i8", Error.CB_ON_PAD_LENGTH, 1)
+    def consume(self, next:Node):
+        p = self.llparse
+        return p.consume('pad_length').otherwise(next)
+
+    # Padding has a prelude before its picked up again later
+    def start(self, end: Node) -> Node:
+        p = self.llparse
         start = p.invoke(
             # we can check the byte before consumption to the length
             p.code.match("llh2__before_pad_length"),
@@ -437,9 +445,16 @@ class Padding(AbstractParser):
                     Error.INVALID_LENGTH.value, "pad_length conflicts with length"
                 )
             },
-        ).otherwise( pad_length.consume(p.consume("pad_length").skipTo(end)))
+        ).otherwise(self.pad_length.consume(end))
+
         # Called before padding has completed to check for invalid lengths
         return self.test("flags", StreamFlags.PADDED, start, end)
+    
+    def build(self, end: Node) -> Node:
+        return self.test("flags", StreamFlags.PADDED, self.consume(end), end)
+     
+    # name aliasing to make abstract class happy...
+    end = build
 
 
 class Priority(AbstractParser):
@@ -462,10 +477,14 @@ class Priority(AbstractParser):
             },
         ).otherwise(
             # Set exclusive on post_dependency_id
-            dep_id.consume_and_complete_after(
-                p.invoke(p.code.match("llh2__post_dependency_id")), stream_weight
+            dep_id.node.skipTo(
+                p.invoke(
+                    p.code.match("llh2__post_dependency_id")
+                ).otherwise(dep_id.on_complete.invoke_pausable(dep_id.err, stream_weight)
+                )
             )
         )
+        
         return start
 
     def build(self, end: Node) -> Node:
@@ -474,18 +493,23 @@ class Priority(AbstractParser):
 
 class DataFrame(Padding):
     # 0x00
-    def __init__(self, llparse, callbacks = {}, fields = {}):
+    def __init__(self, llparse, callbacks={}, fields={}):
         super().__init__(llparse, callbacks, fields)
-        self.body = self.span('on_body')
+        self.body = self.span("on_body")
 
     def build(self, end: Node) -> Node:
         p = self.llparse
-        before_data_body_start = p.invoke(p.code.match('llh2__before_data_frame_body_start'), 
-                                          self.body.start(p.consume('_sub_length').otherwise(self.body.end(Error.CB_ON_BODY_END, end))))
-        return super().build(before_data_body_start)
+        return self.start(p.invoke(
+            p.code.match("llh2__before_data_frame_body_start"),
+            self.body.start(
+                p.consume("_sub_length").otherwise(
+                    self.body.end(Error.CB_ON_BODY_END, super().build(end))
+                )
+            ),
+        ))
 
 
-        
+
 
 
 class HeadersFrame(Padding):
@@ -493,11 +517,11 @@ class HeadersFrame(Padding):
     def build(self, end: Node):
         p = self.llparse
         on_body = self.span("on_body")
-        return super().build(
+        return self.start(
             Priority(self.llparse, self.callbacks, self.fields).build(
                 on_body.start(
                     p.consume("_sub_length").otherwise(
-                        on_body.end(Error.CB_ON_BODY_END, end)
+                        on_body.end(Error.CB_ON_BODY_END, super().build(end))
                     )
                 )
             )
@@ -522,7 +546,6 @@ class RstStreamFrame(AbstractParser):
         )
 
 
-
 class SettingsFrame(AbstractParser):
     """
     Figure 7 of RFC 9113
@@ -545,10 +568,10 @@ class SettingsFrame(AbstractParser):
 
     # 0x04
 
-    def __init__(self, llparse: LLParse, callbacks = {}, fields = {}):
+    def __init__(self, llparse: LLParse, callbacks={}, fields={}):
         super().__init__(llparse, callbacks, fields)
         llparse.property("i16", "settings_id")
-        self.on_settings_id = self.callback('on_settings_id')
+        self.on_settings_id = self.callback("on_settings_id")
         self.on_settings_value = self.uint(
             "settings_value", "i32", Error.CB_ON_SETTINGS_VALUE
         )
@@ -582,8 +605,7 @@ class SettingsFrame(AbstractParser):
             p.invoke(
                 p.code.store("settings_id"),
                 self.on_settings_id.invoke_pausable(
-                    Error.CB_ON_SETTINGS_ID,
-                    self.on_settings_value.consume(sub)
+                    Error.CB_ON_SETTINGS_ID, self.on_settings_value.consume(sub)
                 ),
             ),
         ).otherwise(invalid_ident)
@@ -595,7 +617,7 @@ class SettingsFrame(AbstractParser):
 
 class PushPromiseFrame(Padding):
     # 0x05
-    def __init__(self, llparse, callbacks = {}, fields = {}):
+    def __init__(self, llparse, callbacks={}, fields={}):
         super().__init__(llparse, callbacks, fields)
         self.on_promise_stream_id = self.uint(
             "promise_stream_id", "i32", Error.CB_ON_PROMISE_STREAM_ID
@@ -613,8 +635,8 @@ class PushPromiseFrame(Padding):
             },
         )
         # validate beforehand
-        consume = self.on_promise_stream_id.consume_and_complete_after(validate, end)
-        return super().build(consume)
+        start = self.start(self.on_promise_stream_id.consume_and_complete_after(validate, super().build(end)))
+        return start
 
 
 class PingFrame(AbstractParser):
@@ -648,7 +670,9 @@ class GoAwayFrame(AbstractParser):
 
         self.on_error_code.consume(
             self.on_body.start(
-                p.consume("_sub_length").otherwise(self.on_body.end(Error.CB_ON_BODY_END, end))
+                p.consume("_sub_length").otherwise(
+                    self.on_body.end(Error.CB_ON_BODY_END, end)
+                )
             )
         )
 
@@ -664,14 +688,19 @@ class GoAwayFrame(AbstractParser):
 
 class WindowUpdateFrame(AbstractParser):
     # 0x08
-    def __init__(self, llparse, callbacks = {}, fields = {}):
+    def __init__(self, llparse, callbacks={}, fields={}):
         super().__init__(llparse, callbacks, fields)
         self.on_window_increment = self.uint(
             "window_increment", "i32", Error.CB_ON_WINDOW_INCREMENT
         )
 
     def build(self, end: Node):
-        return self.is_equal("length", 4, self.on_window_increment.consume(end), self.error(Error.INVALID_LENGTH, "Invalid length for WINDOW_UPDATE frame"))
+        return self.is_equal(
+            "length",
+            4,
+            self.on_window_increment.consume(end),
+            self.error(Error.INVALID_LENGTH, "Invalid length for WINDOW_UPDATE frame"),
+        )
 
 
 class ContinuationFrame(AbstractParser):
@@ -728,12 +757,12 @@ class AltSvcFrame(AbstractParser):
 
 class H2Parser(AbstractParser):
     """Main Parser"""
-    def __init__(self, llparse, callbacks = {}, fields = {}):
-        super().__init__(llparse, callbacks, fields)
-        self.on_reset = self.callback('on_reset')
-        self.on_frame_start = self.callback('on_frame_start')
-        self.on_frame_end = self.callback('on_frame_end')
 
+    def __init__(self, llparse, callbacks={}, fields={}):
+        super().__init__(llparse, callbacks, fields)
+        self.on_reset = self.callback("on_reset")
+        self.on_frame_start = self.callback("on_frame_start")
+        self.on_frame_end = self.callback("on_frame_end")
 
     def pause(self, msg: str, Next: Node | None = None):
         res = self.llparse.pause(Error.PAUSED.value, msg)
@@ -741,17 +770,17 @@ class H2Parser(AbstractParser):
             res.otherwise(Next)
         return res
 
-    def consume_unknown_frame_body_ext(self, otherwise:Node):
-        on_body = self.span('on_body')
+    def consume_unknown_frame_body_ext(self, otherwise: Node):
+        on_body = self.span("on_body")
         stop = on_body.end(Error.CB_ON_BODY_END, otherwise)
-        return on_body.start(self.llparse.consume('length').otherwise(stop))
-       
+        return on_body.start(self.llparse.consume("length").otherwise(stop))
 
-    def check_frame_types(self, next:Node):
-        """Checks if a subparser can parse a certain frame type 
+    def check_frame_types(self, next: Node):
+        """Checks if a subparser can parse a certain frame type
         runs on_body span directly if not found if not in strict mode
         otherwise parser will throw an error or pause"""
-        load_type = self.load('type', 
+        load_type = self.load(
+            "type",
             {
                 FrameType.DATA: self.merge(DataFrame, next),
                 FrameType.HEADERS: self.merge(HeadersFrame, next),
@@ -763,8 +792,8 @@ class H2Parser(AbstractParser):
                 FrameType.GOAWAY: self.merge(GoAwayFrame, next),
                 FrameType.WINDOW_UPDATE: self.merge(WindowUpdateFrame, next),
                 FrameType.CONTINUATION: self.merge(ContinuationFrame, next),
-                FrameType.ALTSVC:self.merge(AltSvcFrame, next)
-            }
+                FrameType.ALTSVC: self.merge(AltSvcFrame, next),
+            },
         )
         # TODO: Strict Mode should Throw an error if type is unknown
         load_type.otherwise(self.consume_unknown_frame_body_ext(next))
@@ -774,63 +803,64 @@ class H2Parser(AbstractParser):
         p = self.llparse
         p.property("ptr", "settings")
         # sperate node to safely hook stream_id later, Peephole should clear it beforehand
-        pre_stream_id = p.node('pre_stream_id')
-        
-        length = self.uint('length', 'i32', Error.CB_ON_LENGTH, 3) # i24 in reality hence 3 bits instead of 4
-        stream_id = self.int("stream_id", 'i32', Error.CB_ON_STREAM_ID, 4)
-        ty = self.uint('type', 'i8', Error.CB_ON_TYPE)
-        flags = self.uint('flags', "i8", Error.CB_ON_FLAG)
-        p.property('i8', 'is_exclusive')
+        pre_stream_id = p.node("pre_stream_id")
 
+        length = self.uint(
+            "length", "i32", Error.CB_ON_LENGTH, 3
+        )  # i24 in reality hence 3 bits instead of 4
+        stream_id = self.int("stream_id", "i32", Error.CB_ON_STREAM_ID, 4)
+        ty = self.uint("type", "i8", Error.CB_ON_TYPE)
+        flags = self.uint("flags", "i8", Error.CB_ON_FLAG)
+        p.property("i8", "is_exclusive")
 
-        # _sub_length used for subtraction (internal) 
+        # _sub_length used for subtraction (internal)
         # added so that a subparser doesn't need to be introduced to the build
-        # this way were able to parse all HTTP/2 Frames that are publically in 
-        # use this value should not be exposed to the developer or users end 
+        # this way were able to parse all HTTP/2 Frames that are publically in
+        # use this value should not be exposed to the developer or users end
         # unless absolutely required
-        
-        p.property("i32", "_sub_length")  
-        
-      
+
+        p.property("i32", "_sub_length")
+
         consume_length = length.consume(ty.consume(flags.consume(pre_stream_id)))
 
-        
-        start = self.on_frame_start.invoke_pausable(Error.CB_ON_FRAME_START, consume_length)
+        start = self.on_frame_start.invoke_pausable(
+            Error.CB_ON_FRAME_START, consume_length
+        )
 
-        _exit = p.node('exit')
-        
+        _exit = p.node("exit")
 
         on_reset = self.on_reset.invoke(
-                {
-                    Reset.PAUSE.value: self.pause("paused parser at on_reset", start),
-                    Reset.EXIT.value: _exit,
-                },
-            ).otherwise(self.error(Error.CB_ON_RESET, "on_reset callback error"))
-        
+            {
+                Reset.PAUSE.value: self.pause("paused parser at on_reset", start),
+                Reset.EXIT.value: _exit,
+            },
+        ).otherwise(self.error(Error.CB_ON_RESET, "on_reset callback error"))
+
         end = self.on_frame_end.invoke_pausable(Error.CB_ON_FRAME_END, on_reset)
-        pre_stream_id.otherwise(stream_id.consume(self.check_frame_types(end)))
+        pre_stream_id.otherwise(
+            stream_id.consume(self.check_frame_types(end)))
 
         _exit.skipTo(_exit)
         return start
 
     def do_build(self):
         """writes settings and other important data down"""
-       
+
         # DUE To LLH2 being a little bit bigger than llhttp in some ways
         # autogenerating the CWrapper portion became nessesary
         code = CHEADERS_CWRAPPER_PROLOUGE
         spans = [i for i in self.callbacks.values() if isinstance(i, SpanWrap)]
         cbs = [i for i in self.callbacks.values() if isinstance(i, MatchWrap)]
 
-        code += '\n  /* DATA CALLBACKS */\n\n'
+        code += "\n  /* DATA CALLBACKS */\n\n"
         for s in spans:
-            code += s.cb_property + '\n'
-        
-        code += '\n  /* CALLBACKS */\n\n'
+            code += s.cb_property + "\n"
+
+        code += "\n  /* CALLBACKS */\n\n"
         for cb in cbs:
-            code += cb.cb_property + '\n'
-        
-        code += '};\n'
+            code += cb.cb_property + "\n"
+
+        code += "};\n"
 
         code += CHEADERS_CWRAPPER_EPILOUGE
 
@@ -842,9 +872,9 @@ class H2Parser(AbstractParser):
         code = CAPI_PROLOUGE + "\n"
 
         code += "/* AUTO GENERATED PLEASE DO NOT EDIT!!! */\n\n"
-        
+
         for cbs in self.callbacks.values():
-            code += cbs.do_build() + '\n\n'
+            code += cbs.do_build() + "\n\n"
         return code + CAPI_EPILOUGE
 
     def build_test(self):
@@ -852,12 +882,11 @@ class H2Parser(AbstractParser):
         rest are left to http2.c to handle"""
         code = ""
         # code += "/* AUTO GENERATED CALLBACKS PLEASE DO NOT EDIT!!! */\n\n"
-        
+
         for cbs in self.callbacks.values():
             code += cbs.do_cython_setter()
-  
-        return code
 
+        return code
 
 
 if __name__ == "__main__":
@@ -865,15 +894,14 @@ if __name__ == "__main__":
     p = H2Parser(llh2)
     root = p.build()
     src = llh2.build(
-        root, header_name="llh2", headerGuard="INCLUDE_LLH2_ITSELF_H_",
-        # debug='llh2__internal_debug'
+        root,
+        header_name="llh2",
+        headerGuard="INCLUDE_LLH2_ITSELF_H_",
+        debug="llh2__internal_debug" if "--debug" in sys.argv else None,
     )
     build_folder = Path("src")
     include = Path("include")
 
-
     (build_folder / "llh2.c").write_text(src.c)
-    (include / "llh2.h").write_text(buildCHeaders() + src.header + '\n' + p.do_build())
+    (include / "llh2.h").write_text(buildCHeaders() + src.header + "\n" + p.do_build())
     (build_folder / "api.c").write_text(p.build_api())
-
-

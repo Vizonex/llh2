@@ -1,3 +1,6 @@
 # Big No No
 __pycache__
 .vscode
+*.pyd
+*.so
+*.pytest_cache
