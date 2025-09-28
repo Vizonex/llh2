@@ -92,12 +92,13 @@ enum llparse_state_e {
   s_n_llh2__internal__n_invoke_is_equal_length_1,
   s_n_llh2__internal__n_error_21,
   s_n_llh2__internal__n_pause_16,
+  s_n_llh2__internal__n_consume_pad_length,
+  s_n_llh2__internal__n_invoke_test_flags_1,
   s_n_llh2__internal__n_error_20,
   s_n_llh2__internal__n_invoke_llh2__internal__on_promise_stream_id_complete,
   s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete,
   s_n_llh2__internal__n_error_22,
   s_n_llh2__internal__n_pause_15,
-  s_n_llh2__internal__n_consume_pad_length,
   s_n_llh2__internal__n_error_19,
   s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete,
   s_n_llh2__internal__n_pad_length_uint_8,
@@ -118,7 +119,7 @@ enum llparse_state_e {
   s_n_llh2__internal__n_error_25,
   s_n_llh2__internal__n_ident_1,
   s_n_llh2__internal__n_ident,
-  s_n_llh2__internal__n_invoke_test_flags_1,
+  s_n_llh2__internal__n_invoke_test_flags_2,
   s_n_llh2__internal__n_error_27,
   s_n_llh2__internal__n_pause_19,
   s_n_llh2__internal__n_error_26,
@@ -137,8 +138,14 @@ enum llparse_state_e {
   s_n_llh2__internal__n_error_28,
   s_n_llh2__internal__n_invoke_llh2__internal__on_dependency_id_complete,
   s_n_llh2__internal__n_invoke_llh2__post_dependency_id,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte4,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte3,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte2,
+  s_n_llh2__internal__n_dependency_id_uint_32be,
   s_n_llh2__internal__n_invoke_llh2__before_priority,
   s_n_llh2__internal__n_pause_25,
+  s_n_llh2__internal__n_consume_pad_length_1,
+  s_n_llh2__internal__n_invoke_test_flags_5,
   s_n_llh2__internal__n_error_34,
   s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_3,
   s_n_llh2__internal__n_span_end_llh2__internal__on_body_3,
@@ -153,17 +160,22 @@ enum llparse_state_e {
   s_n_llh2__internal__n_error_32,
   s_n_llh2__internal__n_invoke_llh2__internal__on_dependency_id_complete_1,
   s_n_llh2__internal__n_invoke_llh2__post_dependency_id_1,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte4_1,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte3_1,
+  s_n_llh2__internal__n_dependency_id_uint_32be_byte2_1,
+  s_n_llh2__internal__n_dependency_id_uint_32be_1,
   s_n_llh2__internal__n_invoke_llh2__before_priority_1,
-  s_n_llh2__internal__n_invoke_test_flags_3,
+  s_n_llh2__internal__n_invoke_test_flags_4,
   s_n_llh2__internal__n_error_36,
   s_n_llh2__internal__n_pause_22,
-  s_n_llh2__internal__n_consume_pad_length_1,
   s_n_llh2__internal__n_error_31,
   s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_1,
   s_n_llh2__internal__n_pad_length_uint_8_1,
   s_n_llh2__internal__n_invoke_llh2__before_pad_length_1,
-  s_n_llh2__internal__n_invoke_test_flags_2,
+  s_n_llh2__internal__n_invoke_test_flags_3,
   s_n_llh2__internal__n_pause_27,
+  s_n_llh2__internal__n_consume_pad_length_2,
+  s_n_llh2__internal__n_invoke_test_flags_7,
   s_n_llh2__internal__n_error_38,
   s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_4,
   s_n_llh2__internal__n_span_end_llh2__internal__on_body_4,
@@ -172,12 +184,11 @@ enum llparse_state_e {
   s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start,
   s_n_llh2__internal__n_error_39,
   s_n_llh2__internal__n_pause_26,
-  s_n_llh2__internal__n_consume_pad_length_2,
   s_n_llh2__internal__n_error_37,
   s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_2,
   s_n_llh2__internal__n_pad_length_uint_8_2,
   s_n_llh2__internal__n_invoke_llh2__before_pad_length_2,
-  s_n_llh2__internal__n_invoke_test_flags_4,
+  s_n_llh2__internal__n_invoke_test_flags_6,
   s_n_llh2__internal__n_pause_5,
   s_n_llh2__internal__n_error_5,
   s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete,
@@ -323,7 +334,7 @@ int llh2__internal__on_pad_length_complete (
     llh2__internal_t* s, const unsigned char* p,
     const unsigned char* endp);
 
-int llh2__internal__c_test_flags_1 (
+int llh2__internal__c_test_flags_2 (
   llh2__internal_t* state,
   const unsigned char* p,
     const unsigned char* endp) {
@@ -371,7 +382,7 @@ int llh2__internal__on_stream_weight_complete (
     llh2__internal_t* s, const unsigned char* p,
     const unsigned char* endp);
 
-int llh2__internal__c_test_flags_3 (
+int llh2__internal__c_test_flags_4 (
   llh2__internal_t* state,
   const unsigned char* p,
     const unsigned char* endp) {
@@ -534,6 +545,56 @@ static llparse_state_t llh2__internal__run(
       return s_n_llh2__internal__n_consume_length_1;
       UNREACHABLE;
     }
+    case s_n_llh2__internal__n_span_start_llh2__internal__on_body_1:
+    s_n_llh2__internal__n_span_start_llh2__internal__on_body_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_span_start_llh2__internal__on_body_1;
+      }
+      state->_span_pos0 = (void*) p;
+      state->_span_cb0 = llh2__internal__on_body;
+      goto s_n_llh2__internal__n_consume_length_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_window_increment_uint_32be_byte4:
+    s_n_llh2__internal__n_window_increment_uint_32be_byte4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_window_increment_uint_32be_byte4;
+      }
+      state->window_increment = (state->window_increment << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_window_increment_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_window_increment_uint_32be_byte3:
+    s_n_llh2__internal__n_window_increment_uint_32be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_window_increment_uint_32be_byte3;
+      }
+      state->window_increment = (state->window_increment << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_window_increment_uint_32be_byte4;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_window_increment_uint_32be_byte2:
+    s_n_llh2__internal__n_window_increment_uint_32be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_window_increment_uint_32be_byte2;
+      }
+      state->window_increment = (state->window_increment << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_window_increment_uint_32be_byte3;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_window_increment_uint_32be:
+    s_n_llh2__internal__n_window_increment_uint_32be : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_window_increment_uint_32be;
+      }
+      state->window_increment = (*p);
+      p++;
+      goto s_n_llh2__internal__n_window_increment_uint_32be_byte2;
+      UNREACHABLE;
+    }
     case s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_2:
     s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_2 : {
       switch (llh2__internal__on_body_complete(state, p, endp)) {
@@ -563,6 +624,16 @@ static llparse_state_t llh2__internal__run(
       return s_n_llh2__internal__n_consume_length_2;
       UNREACHABLE;
     }
+    case s_n_llh2__internal__n_span_start_llh2__internal__on_body_2:
+    s_n_llh2__internal__n_span_start_llh2__internal__on_body_2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_span_start_llh2__internal__on_body_2;
+      }
+      state->_span_pos0 = (void*) p;
+      state->_span_cb0 = llh2__internal__on_body;
+      goto s_n_llh2__internal__n_consume_length_2;
+      UNREACHABLE;
+    }
     case s_n_llh2__internal__n_consume_pad_length:
     s_n_llh2__internal__n_consume_pad_length : {
       size_t avail;
@@ -573,12 +644,41 @@ static llparse_state_t llh2__internal__run(
       if (avail >= need) {
         p += need;
         state->pad_length = 0;
-        p++;
-        goto s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete;
+        goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
       }
       
       state->pad_length -= avail;
       return s_n_llh2__internal__n_consume_pad_length;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_test_flags_1:
+    s_n_llh2__internal__n_invoke_test_flags_1 : {
+      switch (llh2__internal__c_test_flags(state, p, endp)) {
+        case 0:
+          goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+        default:
+          goto s_n_llh2__internal__n_consume_pad_length;
+      }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete:
+    s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete : {
+      switch (llh2__before_promise_stream_id_complete(state, p, endp)) {
+        case 1:
+          goto s_n_llh2__internal__n_error_21;
+        default:
+          goto s_n_llh2__internal__n_invoke_llh2__internal__on_promise_stream_id_complete;
+      }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_pad_length_uint_8:
+    s_n_llh2__internal__n_pad_length_uint_8 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_pad_length_uint_8;
+      }
+      state->pad_length = (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete;
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_invoke_llh2__settings_subtract:
@@ -589,6 +689,36 @@ static llparse_state_t llh2__internal__run(
         default:
           goto s_n_llh2__internal__n_ident;
       }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_settings_value_uint_32be_byte4:
+    s_n_llh2__internal__n_settings_value_uint_32be_byte4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_settings_value_uint_32be_byte4;
+      }
+      state->settings_value = (state->settings_value << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_settings_value_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_settings_value_uint_32be_byte3:
+    s_n_llh2__internal__n_settings_value_uint_32be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_settings_value_uint_32be_byte3;
+      }
+      state->settings_value = (state->settings_value << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_settings_value_uint_32be_byte4;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_settings_value_uint_32be_byte2:
+    s_n_llh2__internal__n_settings_value_uint_32be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_settings_value_uint_32be_byte2;
+      }
+      state->settings_value = (state->settings_value << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_settings_value_uint_32be_byte3;
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_settings_value_uint_32be:
@@ -664,6 +794,46 @@ static llparse_state_t llh2__internal__run(
       }
       UNREACHABLE;
     }
+    case s_n_llh2__internal__n_error_code_uint_32be_byte4:
+    s_n_llh2__internal__n_error_code_uint_32be_byte4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_error_code_uint_32be_byte4;
+      }
+      state->error_code = (state->error_code << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_error_code_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_error_code_uint_32be_byte3:
+    s_n_llh2__internal__n_error_code_uint_32be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_error_code_uint_32be_byte3;
+      }
+      state->error_code = (state->error_code << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_error_code_uint_32be_byte4;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_error_code_uint_32be_byte2:
+    s_n_llh2__internal__n_error_code_uint_32be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_error_code_uint_32be_byte2;
+      }
+      state->error_code = (state->error_code << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_error_code_uint_32be_byte3;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_error_code_uint_32be:
+    s_n_llh2__internal__n_error_code_uint_32be : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_error_code_uint_32be;
+      }
+      state->error_code = (*p);
+      p++;
+      goto s_n_llh2__internal__n_error_code_uint_32be_byte2;
+      UNREACHABLE;
+    }
     case s_n_llh2__internal__n_stream_weight_uint_8:
     s_n_llh2__internal__n_stream_weight_uint_8 : {
       if (p == endp) {
@@ -674,13 +844,80 @@ static llparse_state_t llh2__internal__run(
       goto s_n_llh2__internal__n_invoke_llh2__internal__on_stream_weight_complete;
       UNREACHABLE;
     }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte4:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte4;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__post_dependency_id;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte3:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte3;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte4;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte2:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte2;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte3;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be:
+    s_n_llh2__internal__n_dependency_id_uint_32be : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be;
+      }
+      state->dependency_id = (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte2;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_consume_pad_length_1:
+    s_n_llh2__internal__n_consume_pad_length_1 : {
+      size_t avail;
+      size_t need;
+      
+      avail = endp - p;
+      need = state->pad_length;
+      if (avail >= need) {
+        p += need;
+        state->pad_length = 0;
+        goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+      }
+      
+      state->pad_length -= avail;
+      return s_n_llh2__internal__n_consume_pad_length_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_test_flags_5:
+    s_n_llh2__internal__n_invoke_test_flags_5 : {
+      switch (llh2__internal__c_test_flags(state, p, endp)) {
+        case 0:
+          goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+        default:
+          goto s_n_llh2__internal__n_consume_pad_length_1;
+      }
+      UNREACHABLE;
+    }
     case s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_3:
     s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_3 : {
       switch (llh2__internal__on_body_complete(state, p, endp)) {
         case 1:
           goto s_n_llh2__internal__n_pause_25;
         case 0:
-          goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+          goto s_n_llh2__internal__n_invoke_test_flags_5;
         default:
           goto s_n_llh2__internal__n_error_34;
       }
@@ -723,8 +960,68 @@ static llparse_state_t llh2__internal__run(
       goto s_n_llh2__internal__n_invoke_llh2__internal__on_stream_weight_complete_1;
       UNREACHABLE;
     }
-    case s_n_llh2__internal__n_consume_pad_length_1:
-    s_n_llh2__internal__n_consume_pad_length_1 : {
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte4_1:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte4_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte4_1;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__post_dependency_id_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte3_1:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte3_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte3_1;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte4_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_byte2_1:
+    s_n_llh2__internal__n_dependency_id_uint_32be_byte2_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_byte2_1;
+      }
+      state->dependency_id = (state->dependency_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte3_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_dependency_id_uint_32be_1:
+    s_n_llh2__internal__n_dependency_id_uint_32be_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_dependency_id_uint_32be_1;
+      }
+      state->dependency_id = (*p);
+      p++;
+      goto s_n_llh2__internal__n_dependency_id_uint_32be_byte2_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_test_flags_4:
+    s_n_llh2__internal__n_invoke_test_flags_4 : {
+      switch (llh2__internal__c_test_flags_4(state, p, endp)) {
+        case 0:
+          goto s_n_llh2__internal__n_span_start_llh2__internal__on_body_3;
+        default:
+          goto s_n_llh2__internal__n_invoke_llh2__before_priority_1;
+      }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_pad_length_uint_8_1:
+    s_n_llh2__internal__n_pad_length_uint_8_1 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_pad_length_uint_8_1;
+      }
+      state->pad_length = (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_1;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_consume_pad_length_2:
+    s_n_llh2__internal__n_consume_pad_length_2 : {
       size_t avail;
       size_t need;
       
@@ -733,12 +1030,21 @@ static llparse_state_t llh2__internal__run(
       if (avail >= need) {
         p += need;
         state->pad_length = 0;
-        p++;
-        goto s_n_llh2__internal__n_invoke_test_flags_3;
+        goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
       }
       
       state->pad_length -= avail;
-      return s_n_llh2__internal__n_consume_pad_length_1;
+      return s_n_llh2__internal__n_consume_pad_length_2;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_test_flags_7:
+    s_n_llh2__internal__n_invoke_test_flags_7 : {
+      switch (llh2__internal__c_test_flags(state, p, endp)) {
+        case 0:
+          goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+        default:
+          goto s_n_llh2__internal__n_consume_pad_length_2;
+      }
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_4:
@@ -747,7 +1053,7 @@ static llparse_state_t llh2__internal__run(
         case 1:
           goto s_n_llh2__internal__n_pause_27;
         case 0:
-          goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+          goto s_n_llh2__internal__n_invoke_test_flags_7;
         default:
           goto s_n_llh2__internal__n_error_38;
       }
@@ -770,22 +1076,32 @@ static llparse_state_t llh2__internal__run(
       return s_n_llh2__internal__n_consume__sub_length_2;
       UNREACHABLE;
     }
-    case s_n_llh2__internal__n_consume_pad_length_2:
-    s_n_llh2__internal__n_consume_pad_length_2 : {
-      size_t avail;
-      size_t need;
-      
-      avail = endp - p;
-      need = state->pad_length;
-      if (avail >= need) {
-        p += need;
-        state->pad_length = 0;
-        p++;
-        goto s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start;
+    case s_n_llh2__internal__n_span_start_llh2__internal__on_body_4:
+    s_n_llh2__internal__n_span_start_llh2__internal__on_body_4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_span_start_llh2__internal__on_body_4;
       }
-      
-      state->pad_length -= avail;
-      return s_n_llh2__internal__n_consume_pad_length_2;
+      state->_span_pos0 = (void*) p;
+      state->_span_cb0 = llh2__internal__on_body;
+      goto s_n_llh2__internal__n_consume__sub_length_2;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start:
+    s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start : {
+      switch (llh2__before_data_frame_body_start(state, p, endp)) {
+        default:
+          goto s_n_llh2__internal__n_span_start_llh2__internal__on_body_4;
+      }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_pad_length_uint_8_2:
+    s_n_llh2__internal__n_pad_length_uint_8_2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_pad_length_uint_8_2;
+      }
+      state->pad_length = (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_2;
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete:
@@ -817,6 +1133,16 @@ static llparse_state_t llh2__internal__run(
       return s_n_llh2__internal__n_consume_length;
       UNREACHABLE;
     }
+    case s_n_llh2__internal__n_span_start_llh2__internal__on_body:
+    s_n_llh2__internal__n_span_start_llh2__internal__on_body : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_span_start_llh2__internal__on_body;
+      }
+      state->_span_pos0 = (void*) p;
+      state->_span_cb0 = llh2__internal__on_body;
+      goto s_n_llh2__internal__n_consume_length;
+      UNREACHABLE;
+    }
     case s_n_llh2__internal__n_invoke_load_type:
     s_n_llh2__internal__n_invoke_load_type : {
       switch (llh2__internal__c_load_type(state, p, endp)) {
@@ -833,18 +1159,48 @@ static llparse_state_t llh2__internal__run(
         case 5:
           goto s_n_llh2__internal__n_invoke_test_flags;
         case 4:
-          goto s_n_llh2__internal__n_invoke_test_flags_1;
+          goto s_n_llh2__internal__n_invoke_test_flags_2;
         case 3:
           goto s_n_llh2__internal__n_invoke_is_equal_length_2;
         case 2:
           goto s_n_llh2__internal__n_invoke_llh2__before_priority;
         case 1:
-          goto s_n_llh2__internal__n_invoke_test_flags_2;
+          goto s_n_llh2__internal__n_invoke_test_flags_3;
         case 0:
-          goto s_n_llh2__internal__n_invoke_test_flags_4;
+          goto s_n_llh2__internal__n_invoke_test_flags_6;
         default:
           goto s_n_llh2__internal__n_span_start_llh2__internal__on_body;
       }
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_stream_id_int_32be_byte4:
+    s_n_llh2__internal__n_stream_id_int_32be_byte4 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_stream_id_int_32be_byte4;
+      }
+      state->stream_id = (state->stream_id << 8) | ((*p) & 0x80);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_stream_id_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_stream_id_int_32be_byte3:
+    s_n_llh2__internal__n_stream_id_int_32be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_stream_id_int_32be_byte3;
+      }
+      state->stream_id = (state->stream_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_stream_id_int_32be_byte4;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_stream_id_int_32be_byte2:
+    s_n_llh2__internal__n_stream_id_int_32be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_stream_id_int_32be_byte2;
+      }
+      state->stream_id = (state->stream_id << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_stream_id_int_32be_byte3;
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_stream_id_int_32be:
@@ -875,6 +1231,26 @@ static llparse_state_t llh2__internal__run(
       state->type = (*p);
       p++;
       goto s_n_llh2__internal__n_invoke_llh2__internal__on_type_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_length_uint_24be_byte3:
+    s_n_llh2__internal__n_length_uint_24be_byte3 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_length_uint_24be_byte3;
+      }
+      state->length = (state->length << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_invoke_llh2__internal__on_length_complete;
+      UNREACHABLE;
+    }
+    case s_n_llh2__internal__n_length_uint_24be_byte2:
+    s_n_llh2__internal__n_length_uint_24be_byte2 : {
+      if (p == endp) {
+        return s_n_llh2__internal__n_length_uint_24be_byte2;
+      }
+      state->length = (state->length << 8) | (*p);
+      p++;
+      goto s_n_llh2__internal__n_length_uint_24be_byte3;
       UNREACHABLE;
     }
     case s_n_llh2__internal__n_length_uint_24be:
@@ -1114,15 +1490,6 @@ static llparse_state_t llh2__internal__run(
     goto s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_1;
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_span_start_llh2__internal__on_body_1: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_span_start_llh2__internal__on_body_1;
-    }
-    state->_span_pos0 = (void*) p;
-    state->_span_cb0 = llh2__internal__on_body;
-    goto s_n_llh2__internal__n_consume_length_1;
-    UNREACHABLE;
-  }
   s_n_llh2__internal__n_error_14: {
     state->error = 0x18;
     state->reason = "Invalid length for WINDOW_UPDATE frame";
@@ -1156,42 +1523,6 @@ static llparse_state_t llh2__internal__run(
       default:
         goto s_n_llh2__internal__n_error_13;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_window_increment_uint_32be_byte4: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_window_increment_uint_32be_byte4;
-    }
-    state->window_increment = (state->window_increment << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_window_increment_complete;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_window_increment_uint_32be_byte3: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_window_increment_uint_32be_byte3;
-    }
-    state->window_increment = (state->window_increment << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_window_increment_uint_32be_byte4;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_window_increment_uint_32be_byte2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_window_increment_uint_32be_byte2;
-    }
-    state->window_increment = (state->window_increment << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_window_increment_uint_32be_byte3;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_window_increment_uint_32be: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_window_increment_uint_32be;
-    }
-    state->window_increment = (*p);
-    p++;
-    goto s_n_llh2__internal__n_window_increment_uint_32be_byte2;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_invoke_is_equal_length: {
@@ -1287,15 +1618,6 @@ static llparse_state_t llh2__internal__run(
     goto s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_2;
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_span_start_llh2__internal__on_body_2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_span_start_llh2__internal__on_body_2;
-    }
-    state->_span_pos0 = (void*) p;
-    state->_span_cb0 = llh2__internal__on_body;
-    goto s_n_llh2__internal__n_consume_length_2;
-    UNREACHABLE;
-  }
   s_n_llh2__internal__n_invoke_is_equal_length_1: {
     switch (llh2__internal__c_is_equal_length_1(state, p, endp)) {
       case 0:
@@ -1317,7 +1639,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_promise_stream_id_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_test_flags_1;
     return s_error;
     UNREACHABLE;
   }
@@ -1334,18 +1656,9 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_pause_16;
       case 0:
-        goto s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+        goto s_n_llh2__internal__n_invoke_test_flags_1;
       default:
         goto s_n_llh2__internal__n_error_20;
-    }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete: {
-    switch (llh2__before_promise_stream_id_complete(state, p, endp)) {
-      case 1:
-        goto s_n_llh2__internal__n_error_21;
-      default:
-        goto s_n_llh2__internal__n_invoke_llh2__internal__on_promise_stream_id_complete;
     }
     UNREACHABLE;
   }
@@ -1361,7 +1674,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_pad_length_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_consume_pad_length;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete;
     return s_error;
     UNREACHABLE;
   }
@@ -1378,19 +1691,10 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_pause_15;
       case 0:
-        goto s_n_llh2__internal__n_consume_pad_length;
+        goto s_n_llh2__internal__n_invoke_llh2__before_promise_stream_id_complete;
       default:
         goto s_n_llh2__internal__n_error_19;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_pad_length_uint_8: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_pad_length_uint_8;
-    }
-    state->pad_length = (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_invoke_llh2__before_pad_length: {
@@ -1446,33 +1750,6 @@ static llparse_state_t llh2__internal__run(
     }
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_settings_value_uint_32be_byte4: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_settings_value_uint_32be_byte4;
-    }
-    state->settings_value = (state->settings_value << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_settings_value_complete;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_settings_value_uint_32be_byte3: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_settings_value_uint_32be_byte3;
-    }
-    state->settings_value = (state->settings_value << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_settings_value_uint_32be_byte4;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_settings_value_uint_32be_byte2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_settings_value_uint_32be_byte2;
-    }
-    state->settings_value = (state->settings_value << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_settings_value_uint_32be_byte3;
-    UNREACHABLE;
-  }
   s_n_llh2__internal__n_error_23: {
     state->error = 0xb;
     state->reason = "'on_settings_id' callback error";
@@ -1507,8 +1784,8 @@ static llparse_state_t llh2__internal__run(
     return s_error;
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_invoke_test_flags_1: {
-    switch (llh2__internal__c_test_flags_1(state, p, endp)) {
+  s_n_llh2__internal__n_invoke_test_flags_2: {
+    switch (llh2__internal__c_test_flags_2(state, p, endp)) {
       case 0:
         goto s_n_llh2__internal__n_ident;
       default:
@@ -1549,42 +1826,6 @@ static llparse_state_t llh2__internal__run(
       default:
         goto s_n_llh2__internal__n_error_26;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_error_code_uint_32be_byte4: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_error_code_uint_32be_byte4;
-    }
-    state->error_code = (state->error_code << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_error_code_complete;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_error_code_uint_32be_byte3: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_error_code_uint_32be_byte3;
-    }
-    state->error_code = (state->error_code << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_error_code_uint_32be_byte4;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_error_code_uint_32be_byte2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_error_code_uint_32be_byte2;
-    }
-    state->error_code = (state->error_code << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_error_code_uint_32be_byte3;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_error_code_uint_32be: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_error_code_uint_32be;
-    }
-    state->error_code = (*p);
-    p++;
-    goto s_n_llh2__internal__n_error_code_uint_32be_byte2;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_invoke_is_equal_length_2: {
@@ -1670,7 +1911,7 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_error_30;
       default:
-        goto s_n_llh2__internal__n_invoke_llh2__post_dependency_id;
+        goto s_n_llh2__internal__n_dependency_id_uint_32be;
     }
     UNREACHABLE;
   }
@@ -1678,7 +1919,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_body_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_test_flags_5;
     return s_error;
     UNREACHABLE;
   }
@@ -1780,16 +2021,7 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_error_35;
       default:
-        goto s_n_llh2__internal__n_invoke_llh2__post_dependency_id_1;
-    }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_invoke_test_flags_3: {
-    switch (llh2__internal__c_test_flags_3(state, p, endp)) {
-      case 0:
-        goto s_n_llh2__internal__n_span_start_llh2__internal__on_body_3;
-      default:
-        goto s_n_llh2__internal__n_invoke_llh2__before_priority_1;
+        goto s_n_llh2__internal__n_dependency_id_uint_32be_1;
     }
     UNREACHABLE;
   }
@@ -1805,7 +2037,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_pad_length_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_consume_pad_length_1;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_test_flags_4;
     return s_error;
     UNREACHABLE;
   }
@@ -1822,19 +2054,10 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_pause_22;
       case 0:
-        goto s_n_llh2__internal__n_consume_pad_length_1;
+        goto s_n_llh2__internal__n_invoke_test_flags_4;
       default:
         goto s_n_llh2__internal__n_error_31;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_pad_length_uint_8_1: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_pad_length_uint_8_1;
-    }
-    state->pad_length = (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_1;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_invoke_llh2__before_pad_length_1: {
@@ -1846,10 +2069,10 @@ static llparse_state_t llh2__internal__run(
     }
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_invoke_test_flags_2: {
+  s_n_llh2__internal__n_invoke_test_flags_3: {
     switch (llh2__internal__c_test_flags(state, p, endp)) {
       case 0:
-        goto s_n_llh2__internal__n_invoke_test_flags_3;
+        goto s_n_llh2__internal__n_invoke_test_flags_4;
       default:
         goto s_n_llh2__internal__n_invoke_llh2__before_pad_length_1;
     }
@@ -1859,7 +2082,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_body_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_llh2__internal__on_frame_end;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_test_flags_7;
     return s_error;
     UNREACHABLE;
   }
@@ -1887,22 +2110,6 @@ static llparse_state_t llh2__internal__run(
     goto s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete_4;
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_span_start_llh2__internal__on_body_4: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_span_start_llh2__internal__on_body_4;
-    }
-    state->_span_pos0 = (void*) p;
-    state->_span_cb0 = llh2__internal__on_body;
-    goto s_n_llh2__internal__n_consume__sub_length_2;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start: {
-    switch (llh2__before_data_frame_body_start(state, p, endp)) {
-      default:
-        goto s_n_llh2__internal__n_span_start_llh2__internal__on_body_4;
-    }
-    UNREACHABLE;
-  }
   s_n_llh2__internal__n_error_39: {
     state->error = 0x18;
     state->reason = "pad_length conflicts with length";
@@ -1915,7 +2122,7 @@ static llparse_state_t llh2__internal__run(
     state->error = 0x1;
     state->reason = "on_pad_length_complete pause";
     state->error_pos = (const char*) p;
-    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_consume_pad_length_2;
+    state->_current = (void*) (intptr_t) s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start;
     return s_error;
     UNREACHABLE;
   }
@@ -1932,19 +2139,10 @@ static llparse_state_t llh2__internal__run(
       case 1:
         goto s_n_llh2__internal__n_pause_26;
       case 0:
-        goto s_n_llh2__internal__n_consume_pad_length_2;
+        goto s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start;
       default:
         goto s_n_llh2__internal__n_error_37;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_pad_length_uint_8_2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_pad_length_uint_8_2;
-    }
-    state->pad_length = (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_pad_length_complete_2;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_invoke_llh2__before_pad_length_2: {
@@ -1956,7 +2154,7 @@ static llparse_state_t llh2__internal__run(
     }
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_invoke_test_flags_4: {
+  s_n_llh2__internal__n_invoke_test_flags_6: {
     switch (llh2__internal__c_test_flags(state, p, endp)) {
       case 0:
         goto s_n_llh2__internal__n_invoke_llh2__before_data_frame_body_start;
@@ -1997,15 +2195,6 @@ static llparse_state_t llh2__internal__run(
     goto s_n_llh2__internal__n_invoke_llh2__internal__on_body_complete;
     UNREACHABLE;
   }
-  s_n_llh2__internal__n_span_start_llh2__internal__on_body: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_span_start_llh2__internal__on_body;
-    }
-    state->_span_pos0 = (void*) p;
-    state->_span_cb0 = llh2__internal__on_body;
-    goto s_n_llh2__internal__n_consume_length;
-    UNREACHABLE;
-  }
   s_n_llh2__internal__n_error_4: {
     state->error = 0x5;
     state->reason = "'on_stream_id_complete' callback error";
@@ -2023,33 +2212,6 @@ static llparse_state_t llh2__internal__run(
       default:
         goto s_n_llh2__internal__n_error_4;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_stream_id_int_32be_byte4: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_stream_id_int_32be_byte4;
-    }
-    state->stream_id = (state->stream_id << 8) | ((*p) & 0x80);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_stream_id_complete;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_stream_id_int_32be_byte3: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_stream_id_int_32be_byte3;
-    }
-    state->stream_id = (state->stream_id << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_stream_id_int_32be_byte4;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_stream_id_int_32be_byte2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_stream_id_int_32be_byte2;
-    }
-    state->stream_id = (state->stream_id << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_stream_id_int_32be_byte3;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_error_3: {
@@ -2107,24 +2269,6 @@ static llparse_state_t llh2__internal__run(
       default:
         goto s_n_llh2__internal__n_error_1;
     }
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_length_uint_24be_byte3: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_length_uint_24be_byte3;
-    }
-    state->length = (state->length << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_invoke_llh2__internal__on_length_complete;
-    UNREACHABLE;
-  }
-  s_n_llh2__internal__n_length_uint_24be_byte2: {
-    if (p == endp) {
-      return s_n_llh2__internal__n_length_uint_24be_byte2;
-    }
-    state->length = (state->length << 8) | (*p);
-    p++;
-    goto s_n_llh2__internal__n_length_uint_24be_byte3;
     UNREACHABLE;
   }
   s_n_llh2__internal__n_error: {

@@ -65,14 +65,14 @@ int llh2__post_dependency_id(
     const unsigned char* endp
 ){
     s->is_exclusive = (s->dependency_id >> 31) ? 1: 0;
-    s->dependency_id &= 0x7FFFFFFF;
+    s->dependency_id = (uint32_t)(s->dependency_id & 0x7FFFFFFF);
     return 0;
 }
 
 int llh2__before_data_frame_body_start(
     llh2_t* s, const unsigned char *p,
     const unsigned char *endp){
-    s->_sub_length = s->length - s->pad_length;
+    s->_sub_length = (s->pad_length) ? (s->length - (s->pad_length + 1)) : s->length;
     return 0;
 }
 
@@ -90,7 +90,8 @@ int llh2__before_priority(
 void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
                  const char *msg)
 {
-    if (p == endp)
+    /* Check if p is NULL we don't want to accidently cause a crash now do we? */
+    if ((p == '\x00') || (p == endp))
     {
         fprintf(stderr, "p=%p type=%d flags=%02x stream_id=%d next=null debug=%s\n", s, s->type,
                 s->flags, s->stream_id, msg);

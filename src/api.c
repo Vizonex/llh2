@@ -107,6 +107,15 @@ int llh2__internal__on_flags_complete (
 };
 
 
+int llh2__internal__on_pad_length_complete (
+    llh2_t *s, const unsigned char *p,
+    const unsigned char *endp){
+    int err;
+    H2_CALLBACK_MAYBE(s, on_pad_length_complete);
+    return err;
+};
+
+
 /* === Span Callback on_body === */
 
 int llh2__internal__on_body (
@@ -122,15 +131,6 @@ int llh2__internal__on_body_complete (
     const unsigned char *endp){
     int err;
     H2_CALLBACK_MAYBE(s, on_body_complete);
-    return err;
-};
-
-
-int llh2__internal__on_pad_length_complete (
-    llh2_t *s, const unsigned char *p,
-    const unsigned char *endp){
-    int err;
-    H2_CALLBACK_MAYBE(s, on_pad_length_complete);
     return err;
 };
 
