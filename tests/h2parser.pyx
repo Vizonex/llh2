@@ -21,7 +21,13 @@ from llh2 cimport *
 
 cdef extern from "Python.h":
     object PyObject_CallMethodOneArg(object obj, object name, object arg)
-    
+
+cdef class ParserError(Exception):
+    def __init__(self, data:bytes, code:int) -> None:
+        self.msg = data.decode('utf-8', 'replace')
+        self.code = code
+        super().__init__(self.msg, self.code)
+
 
 cdef class Parser:
     cdef llh2_t* _cparser
@@ -367,11 +373,12 @@ cdef class Parser:
         err = llh2_execute(self._cparser, <char*>buf.buf, buf.len)
         print("release")
 
-        if err != H2PE_PAUSED or err != H2PE_OK:
+        if err not in (H2PE_PAUSED, H2PE_OK):
             if self._exception:
-
                 # wrapper raised most likely...
                 raise self._exception
+            else:
+                raise ParserError(<bytes>self._cparser.reason if self._cparser.reason != NULL else b'', self._cparser.error_code)
         PyBuffer_Release(buf)
         return (<int>err)
 

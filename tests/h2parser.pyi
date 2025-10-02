@@ -3,7 +3,6 @@ Debugger and pytest-base for llh2 http/2 frame-parser
 for stress testing the llh2 parser
 """
 
-
 class Parser:
     def reset(self) -> None: ...
     def resume(self) -> None: ...

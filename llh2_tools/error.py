@@ -41,6 +41,8 @@ class Error(IntEnum):
     INVALID_LENGTH = auto()
     INVALID_PAD_LENGTH = auto()
     INVALID_PROMISE_STREAM_ID = auto()
+    INVALID_PUSH_PROMISE_BODY = auto()
+    INVALID_HEADERS_FRAME = auto()
 
     # User Chose to Exit from the loop after parsing a frame
     EXIT = auto()

@@ -512,20 +512,41 @@ class DataFrame(Padding):
 
 
 
-class HeadersFrame(Padding):
+class HeadersFrame(AbstractParser):
     # 0x01
+    def __init__(self, llparse:LLParse, callbacks={}, fields={}):
+        super().__init__(llparse, callbacks, fields)
+        self.priority = Priority(llparse, callbacks,  fields)
+        self.padding = Padding(llparse, callbacks, fields)
+        self.on_body = self.span("on_body")
+
+    def node(self, name:str):
+        return self.llparse.node(f"headers_frame_{name}")
+
     def build(self, end: Node):
-        p = self.llparse
-        on_body = self.span("on_body")
-        return self.start(
-            Priority(self.llparse, self.callbacks, self.fields).build(
-                on_body.start(
-                    p.consume("_sub_length").otherwise(
-                        on_body.end(Error.CB_ON_BODY_END, super().build(end))
-                    )
-                )
+        padding = self.node("padding")
+        priority = self.node("priority")
+        body = self.node("body")
+        
+        padding.otherwise(self.padding.build(priority))
+        priority.otherwise(self.priority.build(body))
+        
+        p  = self.llparse
+        
+        body.otherwise(
+            p.invoke(
+                p.code.match("llh2__before_headers_frame_body"),
+                {0: self.on_body.start(
+                    p.consume("_sub_length").otherwise(self.on_body.end(Error.CB_ON_BODY_END, end))
+                ), 
+                1: end
+                }
+            ).otherwise(
+                self.error(Error.INVALID_LENGTH, "invalid length for headers")
             )
         )
+        # return from root
+        return padding
 
 
 class PriorityFrame(Priority):
@@ -617,27 +638,32 @@ class SettingsFrame(AbstractParser):
 
 class PushPromiseFrame(Padding):
     # 0x05
-    def __init__(self, llparse, callbacks={}, fields={}):
+    def __init__(self, llparse, callbacks={}, fields={})  -> None:
         super().__init__(llparse, callbacks, fields)
         self.on_promise_stream_id = self.uint(
             "promise_stream_id", "i32", Error.CB_ON_PROMISE_STREAM_ID
         )
+        self.body = self.span("on_body")
 
-    def build(self, end: Node):
+    def build(self, end: Node) -> Node:
         p = self.llparse
-
-        validate = p.invoke(
-            p.code.match("llh2__before_promise_stream_id_complete"),
-            {
-                1: self.error(
-                    Error.INVALID_PROMISE_STREAM_ID, "invalid promise_stream_id"
-                )
-            },
+        consume_body = self.body.start(
+            p.consume("_sub_length").otherwise(
+                self.body.end(Error.CB_ON_BODY_END, super().build(end))
+            )
         )
-        # validate beforehand
-        start = self.start(self.on_promise_stream_id.consume_and_complete_after(validate, super().build(end)))
-        return start
 
+        treat_as_dataframe = p.invoke(
+            p.code.match("llh2__before_push_promise_frame_body_start"),
+            {0: consume_body}
+        ).otherwise(
+            self.error(Error.INVALID_PUSH_PROMISE_BODY, "Invalid PUSH_PROMISE body")
+        )
+        return self.start(
+            self.on_promise_stream_id.consume(treat_as_dataframe)
+        )
+       
+    
 
 class PingFrame(AbstractParser):
     # 0x06
@@ -668,21 +694,25 @@ class GoAwayFrame(AbstractParser):
     def build(self, end: Node) -> Node:
         p = self.llparse
 
-        self.on_error_code.consume(
-            self.on_body.start(
-                p.consume("_sub_length").otherwise(
-                    self.on_body.end(Error.CB_ON_BODY_END, end)
+        err_code = self.on_error_code.consume(
+            # When in doubt, Skip over it.
+            self.load('_sub_length', {0:end}).otherwise(
+                self.on_body.start(
+                    p.consume("_sub_length").otherwise(
+                        self.on_body.end(Error.CB_ON_BODY_END, end)
+                    )
                 )
             )
         )
 
-        return self.on_last_stream_id.consume_and_complete_after(
+        return self.on_last_stream_id.consume(
             p.invoke(
                 # subtract sublength by 8 on success
                 p.code.match("llh2__check_goaway_frame_length"),
                 {1: p.error(Error.INVALID_LENGTH, "Invalid GOAWAY length")},
-            ),
-            end,
+            ).otherwise(
+                err_code
+            )
         )
 
 
@@ -723,37 +753,54 @@ class AltSvcFrame(AbstractParser):
         )
         self.origin_value = self.span("altsvc_origin_value")
         self.field_value = self.span("altsvc_field_value")
-        self.before_origin_length_complete = llparse.code.match(
-            "llh2__before_origin_length_complete"
+        self.before_field_start = llparse.code.match(
+            "llh2__before_field_start"
         )
+
+    def node(self, name:str):
+        return self.llparse.node(f"altsvc_frame_{name}")
 
     def build(self, end: Node) -> Node:
         p = self.llparse
+        start = self.node("start")
+        origin = self.node("origin")
+        field = self.node("field")
+        before_field = self.node("before_field")
 
-        before = p.invoke(
-            self.before_origin_length_complete,
+        before_field.otherwise(p.invoke(
+            self.before_field_start,
             {
-                1: self.error(
-                    Error.INVALID_LENGTH, "length conflicts with ALTSVC origin length"
-                )
-            },
-        )
-        # subtract length from altsvc_origin_length to _sub_length in llh2__before_origin_length_complete
-        field_value_start = self.field_value.start(
-            p.consume("_sub_length").otherwise(
-                self.field_value.end(Error.CB_ON_ALTSVC_FIELD_VALUE, end)
-            )
+                0: origin
+            }
+        ).otherwise(self.error(Error.INVALID_LENGTH, "ALTSVC FRAME had invalid length"))
         )
 
-        origin_value_start = self.origin_value.start(
-            p.consume("altsvc_origin_length").otherwise(
-                self.origin_value.end(
-                    Error.CB_ON_ALTSVC_ORIGIN_VALUE, field_value_start
+        field.otherwise(
+            self.field_value.start(
+                p.consume("_sub_length").otherwise(
+                    self.field_value.end(Error.CB_ON_ALTSVC_FIELD_VALUE, end)
                 )
             )
         )
-        return self.origin_length.consume_and_complete_after(before, origin_value_start)
+        # It should be 
+        # 00 | ORIGIN | FIELD
+        # Steps for parsing should be 
+        # 00 -> on_original_length -> ORIGIN (consume and span) -> FIELD (consume span from sub_length (length - (origin_len + 2)))
 
+        origin.otherwise(
+            self.origin_value.start(
+                p.consume("altsvc_origin_length").otherwise(
+                    self.origin_value.end(Error.CB_ON_ALTSVC_ORIGIN_VALUE, field)
+                )
+            )
+        )
+
+        start.otherwise(
+            self.origin_length.consume(
+                before_field
+            )
+        )
+        return start
 
 class H2Parser(AbstractParser):
     """Main Parser"""
@@ -808,7 +855,7 @@ class H2Parser(AbstractParser):
         length = self.uint(
             "length", "i32", Error.CB_ON_LENGTH, 3
         )  # i24 in reality hence 3 bits instead of 4
-        stream_id = self.int("stream_id", "i32", Error.CB_ON_STREAM_ID, 4)
+        stream_id = self.uint("stream_id", "i32", Error.CB_ON_STREAM_ID, 4)
         ty = self.uint("type", "i8", Error.CB_ON_TYPE)
         flags = self.uint("flags", "i8", Error.CB_ON_FLAG)
         p.property("i8", "is_exclusive")
