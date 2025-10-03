@@ -19,16 +19,3 @@ target_include_directories(
     llh2 
     PUBLIC include
 )
-
-# add_executable(
-#     llh2_tests
-#     tests/main.cpp
-#     tests/test_llh2.cpp
-#     src/api.c
-#     src/llh2.c
-#     native/http2.c
-# )
-# target_include_directories(
-#     llh2_tests
-#     PUBLIC include tests
-# )

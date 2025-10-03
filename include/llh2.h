@@ -1,3 +1,12 @@
+
+#ifndef INCLUDE_LLH2_VERSION_H_
+#define INCLUDE_LLH2_VERSION_H_
+
+#define LLH2_VERSION_MAJOR 0
+#define LLH2_VERSION_MINOR 0
+#define LLH2_VERSION_PATCH 1
+
+#endif /* INCLUDE_LLH2_VERSION_H_ */
 #ifndef LLH2_C_HEADERS__H__
 #define LLH2_C_HEADERS__H__
 #ifdef __cplusplus
@@ -39,8 +48,10 @@ enum llh2_errno {
   H2PE_INVALID_LENGTH = 24,
   H2PE_INVALID_PAD_LENGTH = 25,
   H2PE_INVALID_PROMISE_STREAM_ID = 26,
-  H2PE_EXIT = 27,
-  H2PE_USER = 28
+  H2PE_INVALID_PUSH_PROMISE_BODY = 27,
+  H2PE_INVALID_HEADERS_FRAME = 28,
+  H2PE_EXIT = 29,
+  H2PE_USER = 30
 };
 typedef enum llh2_errno llh2_errno_t;
 
