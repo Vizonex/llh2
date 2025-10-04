@@ -93,12 +93,11 @@ class BodyFrameParser(Parser):
         print(f"{self.body}")
         self.data = bytes(self.body)
         print(f"{self.data}")
-    
+
     def on_frame_end(self):
         print(f"{self.body}")
         self.data = bytes(self.body)
         print(f"{self.data}")
-
 
 
 class TestPriorityFrame:
