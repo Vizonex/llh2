@@ -1,14 +1,13 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-
-from llparse import LLParse
-from llparse.pybuilder.main_code import _Match as CodeMatch, Span, Node
-
 from enum import IntEnum, IntFlag
 from typing import Literal
+
+from llparse import LLParse
+from llparse.pybuilder.main_code import Node
+
 from .error import Error
-from llparse.constants import UNSIGNED_TYPES
 
 # Because llh2 is slightly bigger than llhttp
 # we needed to change our apporch to make
@@ -18,7 +17,8 @@ from llparse.constants import UNSIGNED_TYPES
 
 def cleanup_node_dict(ndict: dict[IntEnum | IntFlag | int, Node]) -> dict[int, Node]:
     """Cleans up enums from the dictionary and transforms them to integers"""
-    transform = lambda x: x.value if isinstance(x, (IntEnum, IntFlag)) else int(x)
+    def transform(x):
+        return x.value if isinstance(x, (IntEnum, IntFlag)) else int(x)
     return {transform(k): v for k, v in ndict.items()}
 
 
@@ -27,7 +27,7 @@ class LLExt(ABC):
 
     def __init__(self, llparse: LLParse):
         self.llparse = llparse
-    
+
     @abstractmethod
     def do_build(self) -> str:
         """Generates custom code that llparse may not be able to generate"""
@@ -70,17 +70,15 @@ class LLExt(ABC):
             {0: no},
             yes,
         )
-    def is_le(self, field:str, value: int, le: Node, not_le: Node):
+
+    def is_le(self, field: str, value: int, yes: Node, no: Node):
         p = self.llparse
-        return p.invoke(p.code.is_le(field, value), {0: not_equal}, equal)  # type: ignore
+        return p.invoke(p.code.is_le(field, value), {0: no}, yes)  # type: ignore
 
-
-    def error(self, value: Error | IntEnum | int, reason:str):
+    def error(self, value: Error | IntEnum | int, reason: str):
         if isinstance(value, IntEnum):
             value = value.value
         return self.llparse.error(value, reason)
-
-    
 
 
 class CodeWrap(LLExt):
@@ -114,8 +112,6 @@ class MatchWrap(CodeWrap):
             self.error(error_code),
         )
 
-    
-
     def do_build(self) -> str:
         code = f"int {self.full_name} (\n"
         code += "    llh2_t *s, const unsigned char *p,\n"
@@ -127,12 +123,12 @@ class MatchWrap(CodeWrap):
 
     def do_test(self) -> str:
         code = f"    cdef int _{self.name}(self):\n"
-        code += '        cdef object i\n'
-        code += '        try:\n'
-        code += f'           if i := self.{self.name}():\n'
-        code += f'               return <int>i\n'
-        code += '            return 0\n'
-        code += '       except Execption:\n           return -1'
+        code += "        cdef object i\n"
+        code += "        try:\n"
+        code += f"           if i := self.{self.name}():\n"
+        code += "               return <int>i\n"
+        code += "            return 0\n"
+        code += "       except Execption:\n           return -1"
         return code
 
     def do_cython(self) -> str:
@@ -142,10 +138,9 @@ class MatchWrap(CodeWrap):
         return code
 
     def do_cython_setter(self) -> str:
-        code = f'        if hasattr(self, {self.name}):\n'
-        code += f'            self._csettings.{self.name} = cb_{self.name}\n\n'
+        code = f"        if hasattr(self, {self.name}):\n"
+        code += f"            self._csettings.{self.name} = cb_{self.name}\n\n"
         return code
-
 
     @property
     def cb_property(self) -> str:
@@ -188,14 +183,14 @@ class SpanWrap(LLExt):
 
     def do_test(self) -> str:
         code = f"    cdef int _{self.name}(self, bytes ob):\n"
-        code += '       cdef object i\n'
-        code += '       try:\n'
-        code += f'          if i := self.{self.name}(ob):\n'
-        code += f'              return <int>i\n'
-        code += '           return 0\n\n'
-        code += '       except Execption:\n         return -1'
+        code += "       cdef object i\n"
+        code += "       try:\n"
+        code += f"          if i := self.{self.name}(ob):\n"
+        code += "              return <int>i\n"
+        code += "           return 0\n\n"
+        code += "       except Execption:\n         return -1"
         return code
-    
+
     def do_cython(self) -> str:
         code = f"cdef int cb_{self.name}(llh2_t *s, const char* p, size_t len):\n"
         code += "    cdef Parser p = <Parser>s.data\n"
@@ -203,9 +198,10 @@ class SpanWrap(LLExt):
         return code
 
     def do_cython_setter(self) -> str:
-        code = f'        if hasattr(self, {self.name}):\n'
-        code += f'            self._csettings.{self.name} = cb_{self.name}\n\n'
+        code = f"        if hasattr(self, {self.name}):\n"
+        code += f"            self._csettings.{self.name} = cb_{self.name}\n\n"
         return code
+
 
 BITDICT = {"i8": 1, "i16": 2, "i32": 4}
 
@@ -215,7 +211,9 @@ class IntField(LLExt):
     phase 2 requires unions due to the extreme amount of different attributes frames
     can be possibly carrying"""
 
-    def __factory__(self, field:str, ty: Literal['i8', 'i16', 'i32'], bits:int | None):
+    def __factory__(
+        self, field: str, ty: Literal["i8", "i16", "i32"], bits: int | None
+    ):
         return self.llparse.intBE(field, bits or BITDICT[ty])
 
     def __init__(
@@ -227,7 +225,7 @@ class IntField(LLExt):
         bits: int | None = None,
     ):
         super().__init__(llparse)
-        
+
         if all([field != p.name for p in llparse.properties()]):
             # Create new field if property is non-exitstant so
             # repeated setups can be done safely with other shared nodes
@@ -242,12 +240,11 @@ class IntField(LLExt):
 
     def consume_no_invoke(self, next: Node):
         return self.node.skipTo(next)
-    
+
     def invoke_after(self, next: Node):
         return self.on_complete.invoke_pausable(self.err, next)
 
-
-    def consume_and_complete_after(self, send: Node, next:Node, advance:bool = True):
+    def consume_and_complete_after(self, send: Node, next: Node, advance: bool = True):
         """Handle something before sending through to be invoked"""
         if advance:
             self.node.skipTo(send)
@@ -262,9 +259,13 @@ class IntField(LLExt):
     def do_build(self) -> str:
         return self.on_complete.do_build()
 
+
 class UIntField(IntField):
-    def __factory__(self, field:str, ty: Literal['i8', 'i16', 'i32'], bits:int | None):
+    def __factory__(
+        self, field: str, ty: Literal["i8", "i16", "i32"], bits: int | None
+    ):
         return self.llparse.uintBE(field, bits or BITDICT[ty])
+
 
 UNSIGNED_TYPES: dict[str, str] = {
     "i8": "uint8_t",
@@ -272,104 +273,3 @@ UNSIGNED_TYPES: dict[str, str] = {
     "i32": "uint32_t",
     "i64": "uint64_t",
 }
-
-
-# class UnionField(LLExt):
-#     def __init__(self, llparse: LLParse, shared_field:str, union:str, field:str, ty:Literal['i8', 'i16', 'i32'], bits: int | None = None):
-#         super().__init__(llparse)
-#         self.union = union
-#         self.field = field
-#         self.ty = ty
-#         self.name = llparse.prefix + f'__share_{shared_field}'
-#         self.share_cb = llparse.code.match(self.name)
-#         self.node = llparse.intLE(shared_field, bits or BITDICT[ty])
-#         self.shared_field = shared_field
-
-
-#     def as_field(self) -> str:
-#         return f'  {UNSIGNED_TYPES[self.ty]} {self.field};'
-
-#     def consume(self, next:Node):
-#         """hands off shared_field given from the parser to the union filed
-
-#         psudo code.
-#         ```c
-#         state->frame_union->frame_type->frame_field = state->_dummy_int;
-#         /* reset after use... */
-#         state->_dummy_int = 0;
-#         return 0;
-#         ```
-#         """
-#         p = self.llparse
-#         return self.node.skipTo(p.invoke(self.share_cb).otherwise(next))
-
-
-#     def do_build(self) -> str:
-#         code = f"int {self.name}(\n"
-#         code += "    llframe_t *s, const unsigned char *p,\n"
-#         code += "    const unsigned char *endp){\n"
-#         code += f"   s->_u->{self.union}->{self.field} = s->{self.shared_field};\n"
-#         code += f'    s->{self.shared_field} = 0;'
-#         code += '    return 0;\n};\n'
-#         return code
-
-
-# class UnionStruct(LLExt):
-#     """Used for defining different frames for calling back to when completed"""
-
-#     def __init__(self, llparse: LLParse, parent:str, name:str , shared:str) -> None:
-#         super().__init__(llparse)
-#         self.type_name = f'llh2_{name}'
-#         self.name = name
-#         self.parent = parent
-#         self.shared = shared
-#         self.fields: list[UnionField] = []
-
-#     def as_field(self) -> str:
-#         return f'  {self.type_name}_t {self.name};'
-
-#     def field(self, name:str, ty: Literal['i8', 'i16', 'i32'], bits: int | None = None):
-#         f = UnionField(self.llparse, self.shared, self.name, name, ty, bits)
-#         self.fields.append(f)
-#         return f
-
-#     def do_build(self) -> str:
-#         code = f'typedef struct {self.type_name}_s {self.type_name}_t;\n\n'
-#         code += f"struct {self.type_name}_s" + ' {\n'
-#         for field in self.fields:
-#             code += f'{field.as_field()}\n'
-#         code += '};\n'
-#         return code
-
-
-# class UnionParent(LLExt):
-#     def __init__(self, llparse: LLParse, name:str, shared_property:str):
-#         super().__init__(llparse)
-#         self.name = name
-#         self.type = f'llh2_{name}'
-#         self.shared = shared_property
-#         self.structures: list[UnionStruct] = []
-
-#     def struct(self, name:str):
-#         us = UnionStruct(self.llparse, self.name, name, self.shared)
-#         self.structures.append(us)
-#         return us
-
-#     def do_build(self):
-#         code = f'typedef union {self.type}_u {self.type}_t;\n\n'
-#         for field in self.structures:
-#             code += field.do_build() + '\n'
-
-#         code += f'union {self.type}_u' + ' {\n'
-#         for field in self.structures:
-#             code += f'{field.as_field()}\n'
-#         code += '};\n'
-#         return code
-
-
-# class LLFrame:
-#     def __init__(self, llparse: LLParse) -> None:
-#         self.llparse = llparse
-#         # dummy property to pass off
-#         self.llparse.property('i32', '_dummy')
-#         self.frame_union = UnionParent(self.llparse, 'frame_union', '_dummy')

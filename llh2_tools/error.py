@@ -1,4 +1,4 @@
-from enum import auto, IntEnum
+from enum import IntEnum, auto
 
 
 class Error(IntEnum):
@@ -33,8 +33,6 @@ class Error(IntEnum):
     CB_ON_ALTSVC_ORIGIN_LENGTH = auto()
     CB_ON_ALTSVC_ORIGIN_VALUE = auto()
     CB_ON_ALTSVC_FIELD_VALUE = auto()
-    
-
 
     # Errors
     INVALID_SETTINGS_IDENTIFIER = auto()
