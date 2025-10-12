@@ -1,0 +1,5 @@
+# Development dependencies for testing C Library in python
+# This is where and how we choose to deviate from what llhttp does for unittesting
+cython==3.1.4
+pytest==8.4.2
+setuptools==80.9.0
