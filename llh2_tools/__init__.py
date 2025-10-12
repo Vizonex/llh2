@@ -51,7 +51,15 @@ def build_code():
         debug="llh2__internal_debug" if "--debug" in sys.argv else None,
     )
     build_folder = Path("src")
+    
+    # create directories for ungenerated scripts...
+    if not build_folder.exists():
+        build_folder.mkdir()
+
     include = Path("include")
+    if not include.exists():
+        include.mkdir()
+
 
     (build_folder / "llh2.c").write_text(src.c)
     (include / "llh2.h").write_text(

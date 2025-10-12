@@ -14,8 +14,7 @@ from hashlib import sha256, sha1
 from _hashlib import HASH  # typehinting
 
 # This is going to be controversal but I think mesonbuild is better at this job than
-# CMakelists CMakelists is good but it lacks simplicity.
-
+# CMakelists, CMakelists is good but it lacks simplicity.
 
 # For verification of the releases I will include hashing to verify that these are in fact the releases.
 
@@ -26,8 +25,8 @@ def hash_digest_file(_hash: HASH, file: Path | str, bits: int = 1024):
         while buf := r.read(bits):
             _hash.update(buf)
 
-
-
+# Building with meson is a bit easier as well as more predictable, 
+# from there comes building the distirubtions and releases.
 
 def build_meson():
     """Compiles and then obtains binary releases from a

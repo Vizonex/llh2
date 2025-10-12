@@ -795,6 +795,8 @@ class H2Parser(AbstractParser):
     def __init__(self, llparse, callbacks={}, fields={}):
         super().__init__(llparse, callbacks, fields)
         self.on_reset = self.callback("on_reset")
+
+        # Callbacks related to message starting and ending for different frames.
         self.on_frame_start = self.callback("on_frame_start")
         self.on_frame_end = self.callback("on_frame_end")
 
@@ -835,6 +837,7 @@ class H2Parser(AbstractParser):
 
     def build(self):
         p = self.llparse
+        # TODO: add property for client/server simillar to llhttp but for checking for stream-ids are correct or incorrect.
         p.property("ptr", "settings")
         # sperate node to safely hook stream_id later, Peephole should clear it beforehand
         pre_stream_id = p.node("pre_stream_id")
