@@ -125,7 +125,7 @@ int llh2__before_priority(
     return 1;
 }
 
-llh2__before_field_start(
+int llh2__before_field_start(
     llh2_t* s, const unsigned char *p,
     const unsigned char *endp)
 {
