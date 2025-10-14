@@ -1,0 +1,44 @@
+
+name: "Build Release"
+
+on:
+  workflow_call:
+    inputs:
+      fail-fast:
+        description: Whether the build should stop and fail as soon as any job fails.
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build_release:
+    name: Build Artifacts for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+        fail-fast: ${{ inputs.fail-fast }}
+        matrix:
+          os: [ubuntu-latest, windows-latest, windows-11-arm, macos-13, macos-latest]
+          python-version: ['3.13']
+          
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/setup-python@v6
+        name: Install Python
+        with:
+          check-latest: true
+          python-version: '3.13'
+      
+      - name: "Install Requirements"
+        run: pip install -r requirements-dev.txt
+      - name: "Build Packages"
+        # Use our custom command-line to point to a directory to release the data to for easy uploading...
+        run: python build_release.py --dir dist
+      
+
+      # TODO: I'll ask a few people how to shove these releases into Releases Page on github...
+      - uses: actions/upload-artifact@v4
+        with:
+          name: llh2-*
+          path: dist/*.
