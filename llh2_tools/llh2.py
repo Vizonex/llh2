@@ -196,8 +196,10 @@ void llh2_settings_init(llh2_settings_t* settings);
 
 CAPI_PROLOUGE = """
 
-#include "llh2.h"
 #include <stdio.h>
+#include <string.h> /* memset */
+#include "llh2.h"
+
 
 /* Unlike llhttp a decision early on was made to Autogenerate 
  * this section of code due to it's increase in size comapred to llhttp 

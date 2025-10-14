@@ -13,6 +13,8 @@ import os
 from hashlib import sha256, sha1
 from _hashlib import HASH  # typehinting
 
+from argparse import ArgumentParser
+
 # This is going to be controversal but I think mesonbuild is better at this job than
 # CMakelists, CMakelists is good but it lacks simplicity.
 
@@ -165,17 +167,33 @@ def build_archive():
     - build.sha1 (Sha1 hash)
     - build.sha256 (sha256 hash)
     """
+
+    # Prelude - parse arguments if provided
+    parser =  ArgumentParser()
+    parser.add_argument("-d", "--dir", help="Provide a external directory to use", default=None)
+
+    out = parser.parse_args()
+    external_dir = out.dir
+
+
     # Step 1: build the code...
     build_code()
 
     bin_dir = build_meson()
 
     cwd = Path(__file__).parent
+    if external_dir:
+        outpath = Path(cwd, external_dir)
+        if not outpath.exists():
+            outpath.mkdir()
+    else:
+        outpath = cwd 
+
     SHA1 = hash_all_files(sha1(), bin_dir)
     SHA256 = hash_all_files(sha256(), bin_dir)
 
     RELEASE_NAME = f"llh2-{sys.platform}-{__llh2_version__.as_str()}"
-    with zipfile.ZipFile(RELEASE_NAME + ".zip", "w") as z:
+    with zipfile.ZipFile(outpath / (RELEASE_NAME + ".zip"), "w") as z:
         zipdir(bin_dir, z)
         # code
         zipdir(cwd / "include", z)
@@ -189,7 +207,7 @@ def build_archive():
         z.writestr("build.sha1", SHA1)
         z.writestr("build.sha256", SHA256)
 
-    with tarfile.open(RELEASE_NAME + ".tar.xz", "w:xz") as w:
+    with tarfile.open(outpath / (RELEASE_NAME + ".tar.xz"), "w:xz") as w:
         w.add(bin_dir, "bin")
         w.add(cwd / "include", "include")
         w.add(cwd / "native", "native")

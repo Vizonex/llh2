@@ -1,5 +1,7 @@
+#include <stddef.h>
+#include <stdio.h>
+
 #include "llh2.h"
-#include "stdio.h"
 
 int llh2__settings_subtract (
     llh2__internal_t* s, const unsigned char* p,
@@ -123,7 +125,7 @@ int llh2__before_priority(
     return 1;
 }
 
-llh2__before_field_start(
+int llh2__before_field_start(
     llh2_t* s, const unsigned char *p,
     const unsigned char *endp)
 {
@@ -142,7 +144,7 @@ void llh2__internal_debug(llh2_t *s, const char *p, const char *endp,
                  const char *msg)
 {
     /* Check if p is NULL we don't want to accidently cause a crash now do we? */
-    if ((p == '\x00') || (p == endp))
+    if ((*p == '\x00') || (p == endp))
     {
         fprintf(stderr, "p=%p type=%d flags=%02x stream_id=%d length=%d sublength=%d altsrvc-o-len=%d next=null debug=%s\n", s, s->type,
                 s->flags, s->stream_id, llh2_get_length(s), s->_sub_length,  s->altsvc_origin_length,  msg);
