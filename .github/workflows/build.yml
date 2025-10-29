@@ -38,7 +38,7 @@ jobs:
       
 
       # TODO: I'll ask a few people how to shove these releases into Releases Page on github...
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: llh2-*
           path: dist/*.
