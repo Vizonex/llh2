@@ -6,7 +6,6 @@ on: release
 permissions:
   contents: write
 
-
 jobs:
   build_release:
     name: Build Artifacts for ${{ matrix.os }}
