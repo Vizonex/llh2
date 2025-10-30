@@ -1,7 +1,10 @@
 
 name: "Build Release"
 
-on: [publish]
+on: release
+
+permissions:
+  contents: write
 
 jobs:
   build_release:
@@ -35,3 +38,12 @@ jobs:
         with:
           name: llh2-*
           path: dist/*.
+
+      
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/llh2-*
+            LICENSE
+          
