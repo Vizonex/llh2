@@ -1,14 +1,7 @@
 
 name: "Build Release"
 
-on:
-  workflow_call:
-    inputs:
-      fail-fast:
-        description: Whether the build should stop and fail as soon as any job fails.
-        required: false
-        default: false
-        type: boolean
+on: [publish]
 
 jobs:
   build_release:
