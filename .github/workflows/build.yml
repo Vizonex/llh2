@@ -1,3 +1,4 @@
+
 name: "Build Release"
 
 on: release
@@ -5,17 +6,24 @@ on: release
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  build_release:
-    name: Build Artifacts for ${{ matrix.os }}
+  build:
+    name: Test on ${{ matrix.os }} / Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
-        fail-fast: false
-        matrix:
-          os: [ubuntu-latest, windows-latest, windows-11-arm, macos-13, macos-latest]
-          python-version: ['3.13']
-          
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, windows-11-arm, macos-13, macos-latest]
+        python-version: ['3.14']
+        # exclude:
+        #   - os: windows-11-arm  # setup-python action only supports 3.11+
+        #     python-version: '3.9'
+        #   - os: windows-11-arm  # setup-python action only supports 3.11+
+        #     python-version: '3.10'
     steps:
       - uses: actions/checkout@v5
         with:
@@ -25,9 +33,10 @@ jobs:
         with:
           check-latest: true
           python-version: ${{ matrix.python-version }}
-      
-      - name: "Install Requirements"
-        run: pip install -r requirements-dev.txt
+      - name: Install dependencies
+        # Time for the change we now want to build a C Library instead of a python wheel...
+        run: python -m pip install -r requirements-dev.txt
+
       - name: "Build Packages"
         # Use our custom command-line to point to a directory to release the data to for easy uploading...
         run: python build_release.py --dir dist
@@ -46,5 +55,3 @@ jobs:
           files: |
             dist/llh2-*
             LICENSE
-          
-      
