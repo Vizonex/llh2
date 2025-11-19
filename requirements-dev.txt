@@ -1,7 +1,7 @@
 # Development dependencies for testing C Library in python
 # This is where and how we choose to deviate from what llhttp does for unittesting
 -r requirements.txt
-cython==3.2.0
+cython==3.2.1
 pytest==9.0.1
 setuptools==80.9.0
 meson==1.9.1
