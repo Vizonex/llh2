@@ -2,7 +2,7 @@
 # This is where and how we choose to deviate from what llhttp does for unittesting
 -r requirements.txt
 cython==3.2.3
-pytest==9.0.1
+pytest==9.0.2
 setuptools==80.9.0
 meson==1.9.1
 hyperframe==6.1.0
