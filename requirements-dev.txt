@@ -4,5 +4,5 @@
 cython==3.2.3
 pytest==9.0.1
 setuptools==80.9.0
-meson==1.9.1
+meson==1.10.0
 hyperframe==6.1.0
