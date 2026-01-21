@@ -3,6 +3,6 @@
 -r requirements.txt
 cython==3.2.3
 pytest==9.0.1
-setuptools==80.9.0
+setuptools==80.10.1
 meson==1.9.1
 hyperframe==6.1.0
